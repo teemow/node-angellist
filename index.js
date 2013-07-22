@@ -15,10 +15,10 @@
  */
 
 var config = require('./config'),
-    url = require('url'),
-    request = require('request'),
-    _ = require('underscore'),
-    api_schema = require('./api_schema');
+  url = require('url'),
+  request = require('request'),
+  _ = require('underscore'),
+  api_schema = require('./api_schema');
 
 function get(url, callback) {
   request(url, function (error, response, body) {
@@ -45,17 +45,16 @@ function post(url, body, callback) {
   });
 }
 
-function hasRequiredParams(params, route) {
+function hasRequiredParams(params, required) {
   var fulfilled = true;
 
-  if (route.required) {
-    _.each(route.required, function(required_param) {
+  if (required) {
+    _.each(required, function(required_param) {
       if (!params || !params.hasOwnProperty(required_param)) {
         fulfilled = false;
       }
     });
   }
-
   return fulfilled;
 }
 
@@ -70,6 +69,16 @@ function isAuthenticated(params, route) {
     }
   }
   return authenticated;
+}
+
+function replacePlaceholder(params, route) {
+  if (route.placeholder) {
+    _.each(route.placeholder, function(placeholder) {
+      var re = new RegExp("\:" + placeholder);
+      route.path = route.path.replace(re, params[placeholder]);
+      delete params[placeholder];
+    });
+  }
 }
 
 function createUrl(path, params) {
@@ -116,7 +125,8 @@ _.each(api_schema, function(routes, method) {
   _.each(routes, function(route) {
     api[method + route.name] = function(params, callback) {
       // get parameter dynamically and validate
-      if (!hasRequiredParams(params, route)) {
+      if (!hasRequiredParams(params, route.required) ||
+          !hasRequiredParams(params, route.placeholder)) {
         return callback({error: 'Required parameters: ' + route.required}, null);
       }
       if (!isAuthenticated(params, route)) {
@@ -124,7 +134,7 @@ _.each(api_schema, function(routes, method) {
       }
 
       // placeholder
-
+      replacePlaceholder(params, route);
 
       switch(method) {
         case "get":
