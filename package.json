@@ -1,6 +1,6 @@
 {
   "name": "angellist",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Node module that wraps the AngelList API",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/rgerard/node-angellist.git"
+    "url": "http://github.com/teemow/node-angellist.git"
   },
   "keywords": [
     "angellist",
@@ -18,7 +18,7 @@
   "engines" : {
       "node": "*"
   },
-  "homepage" : "https://github.com/rgerard/node-angellist",
+  "homepage" : "https://github.com/teemow/node-angellist",
   "dependencies": {
     "request" : "*",
     "underscore": "*"
