@@ -20,7 +20,28 @@ var config = require('./config'),
   _ = require('underscore'),
   api_schema = require('./api_schema');
 
+var client;
+
 function get(url, callback) {
+  if (config.cache) {
+    client.get(url, function(err, obj) {
+      if (err || obj === null) {
+        return uncachedGet(url, function(err, result) {
+          if (!err) {
+            client.set(url, JSON.stringify(result));
+            client.expire(url, config.cache);
+          }
+          callback(err, result);
+        });
+      }
+      callback(err, JSON.parse(obj));
+    })
+  } else {
+    uncachedGet(url, callback);
+  }
+}
+
+function uncachedGet(url, callback) {
   request(url, function (error, response, body) {
     if (response.statusCode == 200) {
       callback(error, JSON.parse(body));
@@ -97,9 +118,16 @@ function createUrl(path, params) {
 }
 
 var api = {
-  init: function(clientID, secret) {
+  init: function(clientID, secret, cache) {
     config.clientID = clientID;
     config.secret = secret;
+    config.cache = 0;
+
+    if (cache) {
+      config.cache = cache.timeout || 86400;
+      var redis = require("redis");
+      client = redis.createClient(cache.port, cache.host);
+    }
   },
   setAccessToken: function(token) {
     config.access_token = token;
