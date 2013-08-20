@@ -27,6 +27,9 @@ function get(url, callback) {
     client.get(url, function(err, obj) {
       if (err || obj === null) {
         return uncachedGet(url, function(err, result) {
+          if (typeof result.success === "undefined" && result.success === false) {
+            err = result.error;
+          }
           if (!err) {
             client.set(url, JSON.stringify(result));
             client.expire(url, config.cache);
