@@ -27,9 +27,6 @@ function get(url, callback) {
     client.get(url, function(err, obj) {
       if (err || obj === null) {
         return uncachedGet(url, function(err, result) {
-          if (typeof result.success === "undefined" && result.success === false) {
-            err = result.error;
-          }
           if (!err) {
             client.set(url, JSON.stringify(result));
             client.expire(url, config.cache);
@@ -49,6 +46,10 @@ function uncachedGet(url, callback) {
     if (response.statusCode == 200) {
       callback(error, JSON.parse(body));
     } else {
+      if (error === null) {
+        error = JSON.parse(body).error;
+        body = "";
+      }
       callback(error, body);
     }
   });
