@@ -43,14 +43,24 @@ function get(url, callback) {
 
 function uncachedGet(url, callback) {
   request(url, function (error, response, body) {
+    var obj;
     if (response.statusCode == 200) {
-      callback(error, JSON.parse(body));
-    } else {
-      if (error === null) {
-        error = JSON.parse(body).error;
-        body = "";
+      try {
+        obj = JSON.parse(body);
+      } catch (e) {
+        error = error || e;
       }
-      callback(error, body);
+      callback(error, obj);
+    } else {
+      try {
+        obj = JSON.parse(body);
+      } catch (e) {
+        error = error || e;
+      }
+      if (error === null) {
+        error = obj.error;
+      }
+      callback(error, obj);
     }
   });
 }
@@ -63,7 +73,13 @@ function post(url, body, callback) {
   }, function(error, response, body) {
 
     if (response.statusCode == 200) {
-      callback(error, JSON.parse(body));
+      var obj;
+      try {
+        obj = JSON.parse(body);
+      } catch (e) {
+        error = error || e;
+      }
+      callback(error, obj);
     } else {
       callback(error, body);
     }
