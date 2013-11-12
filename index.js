@@ -24,6 +24,7 @@ var client;
 
 function get(url, callback) {
   if (config.cache) {
+    console.log("cache active");
     client.get(url, function(err, obj) {
       if (err || obj === null) {
         return uncachedGet(url, function(err, result) {
@@ -37,13 +38,17 @@ function get(url, callback) {
       callback(err, JSON.parse(obj));
     })
   } else {
+    console.log("cache inactive");
     uncachedGet(url, callback);
   }
 }
 
 function uncachedGet(url, callback) {
+  console.log("sending request", url);
   request(url, function (error, response, body) {
     var obj;
+    console.log("response body:");
+    console.log(body);
     if (response.statusCode == 200) {
       try {
         obj = JSON.parse(body);
