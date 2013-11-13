@@ -118,13 +118,15 @@ function isAuthenticated(params, route) {
 }
 
 function replacePlaceholder(params, route) {
+  var path = route.path;
   if (route.placeholder) {
     _.each(route.placeholder, function(placeholder) {
       var re = new RegExp("\:" + placeholder);
-      route.path = route.path.replace(re, params[placeholder]);
+      path = path.replace(re, params[placeholder]);
       delete params[placeholder];
     });
   }
+  return path;
 }
 
 function createUrl(path, params) {
@@ -190,17 +192,17 @@ _.each(api_schema, function(routes, method) {
       }
 
       // placeholder
-      replacePlaceholder(params, route);
+      var path = replacePlaceholder(params, route);
 
       switch(method) {
         case "get":
-          get(createUrl('/1' + route.path, params), callback);
+          get(createUrl('/1' + path, params), callback);
           break;
         case "post":
-          post(createUrl('/1' + route.path), params, callback);
+          post(createUrl('/1' + path), params, callback);
           break;
         case "delete":
-          delete(createUrl('/1' + route.path, params), callback);
+          delete(createUrl('/1' + path, params), callback);
           break;
       }
 
