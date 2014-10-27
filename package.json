@@ -20,7 +20,7 @@
   },
   "homepage" : "https://github.com/teemow/node-angellist",
   "dependencies": {
-    "request" : "*",
-    "underscore": "*"
+    "request" : "2.22.0",
+    "underscore": "1.5.1"
   }
 }
